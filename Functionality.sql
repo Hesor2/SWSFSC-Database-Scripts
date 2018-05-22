@@ -23,7 +23,6 @@ drop procedure if exists auth_fetch_access;
 delimiter $$
 create procedure auth_fetch_access(in service_code varchar(64), in uid varchar(48), out application_id int, out user_name varchar(50))
 begin
-    select service_code;
     call auth_fetch_application_id(service_code, application_id);
     select name from users as u where u.application_id = application_id and u.uid = uid into user_name;
     if user_name is null then
@@ -71,12 +70,67 @@ end$$
 delimiter ;
 
 -- USERS -----------------------------------------------------------------------------------------------------------------------
-drop procedure if exists users_register;
+drop procedure if exists user_register;
 delimiter $$
-create procedure users_register(in service_code varchar(64), in user_uid varchar(48), in name varchar(50))
+create procedure user_register(in service_code varchar(64), in user_uid varchar(48), in name varchar(50))
 begin
     declare application_id int;
     call auth_fetch_application_id(service_code, application_id);
     insert into users (application_id, uid, name) values (application_id, user_uid, name);
 end$$
 delimiter ;
+
+-- SEASONS-----------------------------------------------------------------------------------------------------------------------
+drop procedure if exists season_get_all_seasons;
+delimiter $$
+create procedure season_get_all_seasons(in service_code varchar(64), in user_uid varchar(48))
+begin
+	declare application_id int;
+    declare user_name varchar(50);
+    call auth_fetch_access(service_code, user_uid, application_id, user_name);
+    
+	select name, start_date, end_date from seasons as s where s.application_id = application_id order by start_date desc;
+end$$
+delimiter ;
+
+drop procedure if exists season_get_current_seasons;
+delimiter $$
+create procedure season_get_current_seasons(in service_code varchar(64), in user_uid varchar(48))
+begin
+	declare application_id int;
+    declare user_name varchar(50);
+    call auth_fetch_access(service_code, user_uid, application_id, user_name);
+    
+	select name, start_date, end_date from seasons as s where s.application_id = application_id and (current_timestamp() between start_date and end_date) order by start_date desc;
+end$$
+delimiter ;
+
+-- USER SEASON SCORES -----------------------------------------------------------------------------------------------------------
+drop procedure if exists season_get_high_scores;
+delimiter $$
+create procedure season_get_high_scores(in service_code varchar(64), in user_uid varchar(48), in season_name varchar(50))
+begin
+	declare application_id int;
+    declare user_name varchar(50);
+    call auth_fetch_access(service_code, user_uid, application_id, user_name);
+    
+	select u.name, s.score from user_season_scores as s 
+    inner join users as u on application_id = u.application_id and s.user_uid = u.uid
+    where s.application_id = application_id and s.season_name = season_name order by score desc;
+end$$
+delimiter ;
+
+-- COMPETITIONS ----------------------------------------------------------------------------------------------------------------
+/*
+drop procedure if exists competition_get_all_competitions;
+delimiter $$
+create procedure competition_get_all_competitions(in service_code varchar(64), in user_uid varchar(48), in season_name varchar(50))
+begin
+	declare application_id int;
+    declare user_name varchar(50);
+    call auth_fetch_access(service_code, user_uid, application_id, user_name);
+    
+	select name, start_date, end_date from seasons as s where s.application_id = application_id order by start_date desc;
+end$$
+delimiter ;
+*/

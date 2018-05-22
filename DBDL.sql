@@ -60,6 +60,7 @@ create table if not exists user_season_scores
     foreign key(application_id, user_uid) References users(application_id, uid),
     foreign key(application_id, season_name) References seasons(application_id, name)
 );
+-- create index season_high_scores on user_season_scores(application_id, season_name, score);
 
 create table if not exists competitions
 (
