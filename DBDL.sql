@@ -8,6 +8,7 @@ create table if not exists applications
 	id int auto_increment not null,
     name varchar(50) not null,
     service_code varchar(64) not null unique,
+    owner_uid varchar(48),
     primary key(id)
 );
 
@@ -19,6 +20,7 @@ create table if not exists users
     primary key(application_id, uid),
     foreign key(application_id) References applications(id)
 );
+ALTER TABLE users ADD UNIQUE unique_name(application_id, name);
 
 create table if not exists admins
 (
@@ -28,6 +30,7 @@ create table if not exists admins
     primary key(application_id, user_uid),
     foreign key(application_id, user_uid) References users(application_id, uid)
 );
+ALTER TABLE applications ADD CONSTRAINT fk_owner FOREIGN KEY (id, owner_uid) REFERENCES admins(application_id, user_uid);
 
 create table if not exists seasons
 (
