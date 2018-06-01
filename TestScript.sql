@@ -1,20 +1,34 @@
 use sport_clubs_service;
 
-insert into applications (name, service_code) values ("Sundby", "123456");
+call service_create_application("Sundby", "123456", "uid 1", "Markus", "mobile pay");
+call service_create_application("test application", "test code", "test owner uid", "test owner", "cash");
 
-insert into users (application_id, uid, name) values (1, "uid 1", "Markus");
-insert into users (application_id, uid, name) values (1, "uid 2", "Nikolaj");
-insert into admins (application_id, user_uid, payment_information) values (1, "uid 1", "mobile pay");
+call user_register("123456", "uid 2", "Nikolaj");
+-- call owner_create_admin("123456", "uid 1", "Nikolaj", "stuff");
 
-insert into seasons (application_id, name, start_date, end_date) values (1, "season 1", '2003-12-20 01:02:03', '2003-12-31 01:02:03');
+call user_check_name_availability("123456", "Nikola");
 
-insert into competitions(application_id, season_name, name, admin_uid, start_date, end_date, prize) values (1, "season 1", "competition 1", "uid 1", '2003-12-20 01:02:03', '2003-12-31 01:02:03', "gift-card");
+call admin_create_season("123456", "uid 1", "season test", '2001-12-20 01:02:03', '2003-12-20 01:02:03');
+call admin_create_season("123456", "uid 1", "season test2", '2001-12-20 01:02:03', '2018-12-20 01:02:03');
+call admin_create_season("123456", "uid 1", "season test3", '2001-12-20 01:02:03', '2019-12-20 01:02:03');
+call admin_create_season("123456", "uid 1", "season test4", '2001-12-20 01:02:03', '2023-12-20 01:02:03');
+call admin_create_season("123456", "uid 1", "season test5", '1994-12-20 01:02:03', '2017-12-20 01:02:03');
 
-insert into teams (application_id, name) values (1, "sundby team 1");
-insert into teams (application_id, name) values (1, "sundby team 2");
+call admin_create_competition("123456", "uid 1", "season test", "competitions test", '2002-12-20 01:02:03', '2003-12-20 01:02:03', "gift card");
 
-insert into matches(application_id, season_name, competition_name, team_1_name, team_2_name, start_date) values (1, "season 1", "competition 1", "sundby team 1", "sundby team 2", '2002-12-20 01:02:03');
+call season_get_all_seasons("123456", "uid 1", 1, 10);
+call season_get_current_seasons("123456", "uid 1", 1, 10);
 
-insert into guesses (application_id, season_name, competition_name, team_1_name, team_2_name, start_date, user_uid, result) values (1, "season 1", "competition 1", "sundby team 1", "sundby team 2", '2002-12-20 01:02:03', "uid 1", 2);
+call season_get_high_scores("123456", "uid 1", "season test", 1, 10);
 
-update matches set result = 2 where application_id = 1 and season_name = "season 1" and competition_name = "competition 1" and team_1_name = "sundby team 1" and team_2_name =  "sundby team 2" and start_date ='2002-12-20 01:02:03';
+call season_get_all_competitions("123456", "uid 1", "season test", 1, 10);
+
+call competition_get_current_competitions("123456", "uid 1", 1, 10);
+
+call competition_get_high_scores("123456", "uid 1", "season test","competitions test", 1, 10);
+
+insert into user_season_scores(application_id, season_name, user_uid, score) values (1, "season test", "uid 1", 400);
+insert into user_season_scores(application_id, season_name, user_uid, score) values (1, "season test", "uid 2", 200);
+
+insert into user_competition_scores(application_id, season_name, competition_name, user_uid, score, payment_code) values (1, "season test", "competitions test", "uid 1", 200, "yup");
+insert into user_competition_scores(application_id, season_name, competition_name, user_uid, score, payment_code) values (1, "season test", "competitions test", "uid 2", 400, "yup2");

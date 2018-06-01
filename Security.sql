@@ -3,9 +3,6 @@ use sport_clubs_service;
 drop role if exists 'service_interface';
 create role 'service_interface';
 
-grant execute on procedure auth_check_admin to 'service_interface';
-grant execute on procedure auth_check_owner to 'service_interface';
-
 grant execute on procedure owner_create_admin to 'service_interface';
 
 grant execute on procedure admin_create_season to 'service_interface';
@@ -22,6 +19,8 @@ grant execute on procedure season_get_current_competitions to 'service_interface
 
 grant execute on procedure competition_get_all_competitions to 'service_interface';
 grant execute on procedure competition_get_current_competitions to 'service_interface';
+grant execute on procedure competition_get_high_scores to 'service_interface';
+
 
 
 drop user if exists 'service1'@'localhost';
