@@ -204,7 +204,7 @@ Begin
     if new.result not between 0 and 2 then
 		signal sqlstate '45000' set message_text = 'Result must be between 0 and 2';
     end if ;
-	if new.start_date > current_timestamp() then
+	if new.start_date < current_timestamp() then
 		signal sqlstate '45000' set message_text = 'You cannot guess on an ongoing or previous match';
 	end if;
 End//
