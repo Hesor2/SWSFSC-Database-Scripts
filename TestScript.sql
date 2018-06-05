@@ -46,9 +46,9 @@ call match_get_upcoming_matches("123456", "0h1HL0WQopYM1EduLKrYFW3bjJf1", 1, 10)
 
 call admin_decide_match_result("123456", "0h1HL0WQopYM1EduLKrYFW3bjJf1", "season test","competitions test", "team 3", "team 4", '2019-12-20 01:02:03', 2);
 
-call admin_get_pending_payments("123456", "0h1HL0WQopYM1EduLKrYFW3bjJf1", "season test","competitions test");
+call admin_get_pending_payments("123456", "0h1HL0WQopYM1EduLKrYFW3bjJf1", "season test","competitions test", 1, 10);
 
-call admin_confirm_payment("123456", "0h1HL0WQopYM1EduLKrYFW3bjJf1", "season test","competitions test", "f1c3bfdd");
+-- call admin_confirm_payment("123456", "0h1HL0WQopYM1EduLKrYFW3bjJf1", "season test","competitions test", "f1c3bfdd");
 
 
 

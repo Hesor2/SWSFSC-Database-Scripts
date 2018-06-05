@@ -236,15 +236,17 @@ delimiter ;
 
 drop procedure if exists admin_get_pending_payments;
 delimiter $$
-create procedure admin_get_pending_payments(in service_code varchar(64), in user_uid varchar(48), in season_name varchar(50), in competition_name varchar(50))
+create procedure admin_get_pending_payments(in service_code varchar(64), in user_uid varchar(48), in season_name varchar(50), in competition_name varchar(50), in page int, in page_size int)
 begin
 	declare application_id int;
     declare user_name varchar(50);
+    declare page_offset int;
     call auth_fetch_access(service_code, user_uid, application_id, user_name);
     call auth_check_admin(application_id, user_uid);
+    call util_fetch_paging(page, page_size, page_offset);
     
-    select payment_code from user_competition_scores as ucs
-    where ucs.application_id = application_id and ucs.season_name = season_name and ucs.competition_name = competition_name and ucs.payment_confirmed = false;
+    select season_name, competition_name, payment_code from user_competition_scores as ucs
+    where ucs.application_id = application_id and ucs.season_name = season_name and ucs.competition_name = competition_name and ucs.payment_confirmed = false limit page_size offset page_offset;
 end$$
 delimiter ;
 
@@ -415,24 +417,6 @@ begin
 end$$
 delimiter ;
 
-drop procedure if exists competition_get_high_scores;
-delimiter $$
-create procedure competition_get_high_scores(in service_code varchar(64), in user_uid varchar(48), in season_name varchar(50), in competition_name varchar(50), in page int, in page_size int)
-begin
-	declare application_id int;
-    declare user_name varchar(50);
-    declare page_offset int;
-    call auth_fetch_access(service_code, user_uid, application_id, user_name);
-    call util_fetch_paging(page, page_size, page_offset);
-    
-	SET @position=page_offset;
-    select @position:=@position+1 as position, h.user_name, h.score from
-	(select u.name as user_name, s.score from user_competition_scores as s 
-    inner join users as u on application_id = u.application_id and s.user_uid = u.uid
-    where s.application_id = application_id and s.season_name = season_name and s.competition_name = competition_name order by score desc limit page_size offset page_offset) as h;
-end$$
-delimiter ;
-
 drop procedure if exists competition_get_all_matches;
 delimiter $$
 create procedure competition_get_all_matches(in service_code varchar(64), in user_uid varchar(48), in season_name varchar(50), in competition_name varchar(50), in page int, in page_size int)
@@ -464,6 +448,24 @@ begin
     from matches as m
     left join guesses as g on g.application_id = m.application_id and g.season_name = m.season_name and g.competition_name = m.competition_name and g.team_1_name = m.team_1_name and g.team_2_name = m.team_2_name and g.start_date = m.start_date and g.user_uid = user_uid 
     where m.application_id = application_id and m.season_name = season_name and m.competition_name = competition_name and m.start_date > current_timestamp() order by start_date desc limit page_size offset page_offset;
+end$$
+delimiter ;
+
+drop procedure if exists competition_get_high_scores;
+delimiter $$
+create procedure competition_get_high_scores(in service_code varchar(64), in user_uid varchar(48), in season_name varchar(50), in competition_name varchar(50), in page int, in page_size int)
+begin
+	declare application_id int;
+    declare user_name varchar(50);
+    declare page_offset int;
+    call auth_fetch_access(service_code, user_uid, application_id, user_name);
+    call util_fetch_paging(page, page_size, page_offset);
+    
+	SET @position=page_offset;
+    select @position:=@position+1 as position, h.user_name, h.score from
+	(select u.name as user_name, s.score from user_competition_scores as s 
+    inner join users as u on application_id = u.application_id and s.user_uid = u.uid
+    where s.application_id = application_id and s.season_name = season_name and s.competition_name = competition_name order by score desc limit page_size offset page_offset) as h;
 end$$
 delimiter ;
 
